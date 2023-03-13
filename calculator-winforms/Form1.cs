@@ -7,7 +7,6 @@ namespace calculator_winforms
     {
         IFormatProvider cultureUS = new System.Globalization.CultureInfo("en-US");
         const string divisionByZeroErrorMessage = "Impossible";
-        private bool commaIsAvailable = true;
         public string currentValue = "0";
 
         public Form1()
@@ -76,10 +75,6 @@ namespace calculator_winforms
                 int lenght = tbScreen.Text.Length;
                 if (lenght > 1)
                 {
-                    if (tbScreen.Text[lenght - 1] == '.')
-                    {
-                        commaIsAvailable = true;
-                    }
                     currentValue = currentValue.Remove(currentValue.Length - 1);
                     tbScreen.Text = tbScreen.Text.Remove(lenght - 1);
                 }
@@ -92,7 +87,6 @@ namespace calculator_winforms
             {
                 currentValue = "0";
                 tbScreen.Text = currentValue;
-                commaIsAvailable = true;
             }
         }
 
@@ -116,7 +110,7 @@ namespace calculator_winforms
 
         private void OnCommaBtnClick(object sender, EventArgs e)
         {
-            if (commaIsAvailable && !currentValue.Contains('.'))
+            if (!currentValue.Contains('.'))
             {
                 if (tbScreen.Text.Equals(divisionByZeroErrorMessage))
                 {
@@ -127,12 +121,10 @@ namespace calculator_winforms
                 {
                     currentValue = "0.";
                     tbScreen.Text += currentValue;
-                    commaIsAvailable = false;
                     return;
                 }
                 currentValue += ".";
                 tbScreen.Text += ".";
-                commaIsAvailable = false;
             }
         }
 
@@ -141,7 +133,6 @@ namespace calculator_winforms
             if (!tbScreen.Text.Equals(divisionByZeroErrorMessage))
             {
                 var operation = ((Button)sender).Text;
-                commaIsAvailable = true;
 
                 if (isPreviusAnOperation())
                 {
@@ -180,14 +171,6 @@ namespace calculator_winforms
                     }
                     tbScreen.Text = resultAsDouble.ToString().Replace(',', '.');
                     currentValue = tbScreen.Text;
-                    if (tbScreen.Text.Contains('.'))
-                    {
-                        commaIsAvailable = false;
-                    }
-                    else
-                    {
-                        commaIsAvailable = true;
-                    }
                 }
                 catch (DivideByZeroException)
                 {
@@ -195,7 +178,7 @@ namespace calculator_winforms
                 }
             }
         }
-
+        #region TEST
         private System.Windows.Forms.Timer timer1;
 
         private void InitTimer(object sender, EventArgs e)
@@ -209,5 +192,6 @@ namespace calculator_winforms
         {
             Console.WriteLine(currentValue.ToString());
         }
+        #endregion
     }
 }
