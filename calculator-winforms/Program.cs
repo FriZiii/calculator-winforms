@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+
 namespace calculator_winforms
 {
     internal static class Program

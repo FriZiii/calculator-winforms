@@ -1,4 +1,5 @@
 using System.Data;
+using System.Timers;
 
 namespace calculator_winforms
 {
@@ -7,6 +8,7 @@ namespace calculator_winforms
         IFormatProvider cultureUS = new System.Globalization.CultureInfo("en-US");
         const string divisionByZeroErrorMessage = "Impossible";
         private bool commaIsAvailable = true;
+        public string currentValue = "0";
 
         public Form1()
         {
@@ -30,6 +32,7 @@ namespace calculator_winforms
                 }
             }
         }
+
         public void ChangeFontSize(Control control, float btnSize, float tbSize)
         {
             switch (control)
@@ -56,11 +59,13 @@ namespace calculator_winforms
 
             if (Equals(tbScreen.Text, "0"))
             {
-                tbScreen.Text = string.Empty;
+                currentValue = string.Empty;
+                tbScreen.Text = currentValue;
             }
 
             var value = ((Button)sender).Text;
 
+            currentValue += value;
             tbScreen.Text += value;
         }
 
@@ -75,6 +80,7 @@ namespace calculator_winforms
                     {
                         commaIsAvailable = true;
                     }
+                    currentValue = currentValue.Remove(currentValue.Length - 1);
                     tbScreen.Text = tbScreen.Text.Remove(lenght - 1);
                 }
                 else if (lenght == 1)
@@ -84,7 +90,8 @@ namespace calculator_winforms
             }
             else
             {
-                tbScreen.Text = "0";
+                currentValue = "0";
+                tbScreen.Text = currentValue;
                 commaIsAvailable = true;
             }
         }
@@ -94,28 +101,36 @@ namespace calculator_winforms
 
             if (!tbScreen.Text.Equals(divisionByZeroErrorMessage))
             {
-                if (!tbScreen.Text.Equals("0"))
+                if (!tbScreen.Text.Equals("0") && !isPreviusAnOperation())
                 {
-                    var value = double.Parse(tbScreen.Text, cultureUS);
+                    var value = double.Parse(currentValue, cultureUS);
                     value *= -1;
-                    tbScreen.Text = value.ToString(cultureUS);
+
+                    tbScreen.Text = tbScreen.Text.Remove(tbScreen.Text.Length - (currentValue.Length));
+
+                    currentValue = value.ToString(cultureUS);
+                    tbScreen.Text += currentValue.ToString(cultureUS);
                 }
             }
         }
 
         private void OnCommaBtnClick(object sender, EventArgs e)
         {
-            if (commaIsAvailable)
+            if (commaIsAvailable && !currentValue.Contains('.'))
             {
                 if (tbScreen.Text.Equals(divisionByZeroErrorMessage))
                 {
-                    tbScreen.Text = "0";
+                    currentValue = "0";
+                    tbScreen.Text = currentValue;
                 }
                 if (isPreviusAnOperation())
                 {
-                    tbScreen.Text += "0.";
+                    currentValue = "0.";
+                    tbScreen.Text += currentValue;
+                    commaIsAvailable = false;
                     return;
                 }
+                currentValue += ".";
                 tbScreen.Text += ".";
                 commaIsAvailable = false;
             }
@@ -133,6 +148,7 @@ namespace calculator_winforms
                     tbScreen.Text = tbScreen.Text.Remove(tbScreen.Text.Length - 1) + operation;
                     return;
                 }
+                currentValue = string.Empty;
                 tbScreen.Text += operation;
             }
         }
@@ -156,22 +172,21 @@ namespace calculator_winforms
                     DataTable dt = new();
 
                     var result = dt.Compute(expression, "").ToString();
-                    double resultDouble = Convert.ToDouble(result);
-                    if (double.IsInfinity(resultDouble) || result.Equals("NaN"))
+                    double resultAsDouble = Convert.ToDouble(result);
+                    if (double.IsInfinity(resultAsDouble) || result.Equals("NaN"))
                     {
                         tbScreen.Text = divisionByZeroErrorMessage;
+                        return;
+                    }
+                    tbScreen.Text = resultAsDouble.ToString().Replace(',', '.');
+                    currentValue = tbScreen.Text;
+                    if (tbScreen.Text.Contains('.'))
+                    {
+                        commaIsAvailable = false;
                     }
                     else
                     {
-                        tbScreen.Text = resultDouble.ToString().Replace(',', '.');
-                        if (tbScreen.Text.Contains('.'))
-                        {
-                            commaIsAvailable = false;
-                        }
-                        else
-                        {
-                            commaIsAvailable = true;
-                        }
+                        commaIsAvailable = true;
                     }
                 }
                 catch (DivideByZeroException)
@@ -179,6 +194,20 @@ namespace calculator_winforms
                     tbScreen.Text = divisionByZeroErrorMessage;
                 }
             }
+        }
+
+        private System.Windows.Forms.Timer timer1;
+
+        private void InitTimer(object sender, EventArgs e)
+        {
+            timer1 = new System.Windows.Forms.Timer();
+            timer1.Tick += new EventHandler(timer1_Tick);
+            timer1.Interval = 100; // in miliseconds
+            timer1.Start();
+        }
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            Console.WriteLine(currentValue.ToString());
         }
     }
 }
