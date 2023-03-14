@@ -1,4 +1,6 @@
 using System.Data;
+using System.Drawing;
+using System.Security.Policy;
 using System.Timers;
 
 namespace calculator_winforms
@@ -7,11 +9,12 @@ namespace calculator_winforms
     {
         IFormatProvider cultureUS = new System.Globalization.CultureInfo("en-US");
         const string divisionByZeroErrorMessage = "Impossible";
-        public string currentValue = "0";
+        public string currentValue;
 
         public Form1()
         {
             InitializeComponent();
+            currentValue = tbScreen.Text;
         }
 
         private void ScaleFontSize(object sender, EventArgs e)
@@ -47,6 +50,46 @@ namespace calculator_winforms
             {
                 ChangeFontSize(child, btnSize, tbSize);
             }
+        }
+
+        private void LockBtnWhenError()
+        {
+            if (tbScreen.Text.Equals(divisionByZeroErrorMessage))
+            {
+                btnAdd.Enabled = false;
+                btnDivide.Enabled = false;
+                btnMultiply.Enabled = false;
+                btnSubtract.Enabled = false;
+
+                btnEquals.Enabled = false;
+                btnChangeSign.Enabled = false;
+
+                btnClearSign.Enabled = false;
+            }
+            else
+            {
+                btnAdd.Enabled = true;
+                btnDivide.Enabled = true;
+                btnMultiply.Enabled = true;
+                btnSubtract.Enabled = true;
+
+                btnEquals.Enabled = true;
+                btnChangeSign.Enabled = true;
+
+                btnClearSign.Enabled = true;
+            }
+        }
+
+        private void ScrollScreen()
+        {
+            tbScreen.SelectionStart = tbScreen.TextLength;
+            tbScreen.ScrollToCaret(); 
+        }
+
+        private void ScreenChangedText(object sender, EventArgs e)
+        {
+            LockBtnWhenError();
+            ScrollScreen();
         }
 
         private void OnNumbersBtnClick(object sender, EventArgs e)
@@ -95,7 +138,7 @@ namespace calculator_winforms
 
             if (!tbScreen.Text.Equals(divisionByZeroErrorMessage))
             {
-                if (!tbScreen.Text.Equals("0") && !isPreviusAnOperation())
+                if (!tbScreen.Text.Equals("0") && !IsPreviusAnOperation())
                 {
                     var value = double.Parse(currentValue, cultureUS);
                     value *= -1;
@@ -112,15 +155,10 @@ namespace calculator_winforms
         {
             if (!currentValue.Contains('.'))
             {
-                if (tbScreen.Text.Equals(divisionByZeroErrorMessage))
-                {
-                    currentValue = "0";
-                    tbScreen.Text = currentValue;
-                }
-                if (isPreviusAnOperation())
+                if (tbScreen.Text.Equals(divisionByZeroErrorMessage) || IsPreviusAnOperation())
                 {
                     currentValue = "0.";
-                    tbScreen.Text += currentValue;
+                    tbScreen.Text = currentValue;
                     return;
                 }
                 currentValue += ".";
@@ -134,7 +172,7 @@ namespace calculator_winforms
             {
                 var operation = ((Button)sender).Text;
 
-                if (isPreviusAnOperation())
+                if (IsPreviusAnOperation())
                 {
                     tbScreen.Text = tbScreen.Text.Remove(tbScreen.Text.Length - 1) + operation;
                     return;
@@ -144,7 +182,7 @@ namespace calculator_winforms
             }
         }
 
-        private bool isPreviusAnOperation()
+        private bool IsPreviusAnOperation()
         {
             int lastChar = tbScreen.Text[^1];
             if (lastChar.Equals('+') || lastChar.Equals('-') || lastChar.Equals('÷') || lastChar.Equals('×'))
@@ -154,7 +192,7 @@ namespace calculator_winforms
 
         private void OnEqualsBtnClick(object sender, EventArgs e)
         {
-            if (!isPreviusAnOperation())
+            if (!IsPreviusAnOperation())
             {
                 var expression = tbScreen.Text.Replace("×", "*").Replace("÷", "/");
 
@@ -169,29 +207,18 @@ namespace calculator_winforms
                         tbScreen.Text = divisionByZeroErrorMessage;
                         return;
                     }
-                    tbScreen.Text = resultAsDouble.ToString().Replace(',', '.');
+                    tbScreen.Text = resultAsDouble.ToString("G6").Replace(',', '.');
                     currentValue = tbScreen.Text;
                 }
                 catch (DivideByZeroException)
                 {
                     tbScreen.Text = divisionByZeroErrorMessage;
                 }
+                catch(OverflowException)
+                {
+                    tbScreen.Text = divisionByZeroErrorMessage;
+                }
             }
         }
-        #region TEST
-        private System.Windows.Forms.Timer timer1;
-
-        private void InitTimer(object sender, EventArgs e)
-        {
-            timer1 = new System.Windows.Forms.Timer();
-            timer1.Tick += new EventHandler(timer1_Tick);
-            timer1.Interval = 100; // in miliseconds
-            timer1.Start();
-        }
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            Console.WriteLine(currentValue.ToString());
-        }
-        #endregion
     }
 }

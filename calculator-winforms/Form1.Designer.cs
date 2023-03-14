@@ -52,15 +52,14 @@
             btnMultiply = new Button();
             tbScreen = new TextBox();
             tableLayoutPanel2 = new TableLayoutPanel();
-            btnCE = new Button();
             btnC = new Button();
+            btnClearSign = new Button();
             btnChangeSign = new Button();
             btnDivide = new Button();
             tableLayoutPanel3 = new TableLayoutPanel();
             button4 = new Button();
             button5 = new Button();
             tableLayoutPanel4 = new TableLayoutPanel();
-            textBox2 = new TextBox();
             tableLayoutPanel5 = new TableLayoutPanel();
             button6 = new Button();
             button7 = new Button();
@@ -86,7 +85,6 @@
             tableLayoutPanel11.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             tableLayoutPanel3.SuspendLayout();
-            tableLayoutPanel4.SuspendLayout();
             tableLayoutPanel5.SuspendLayout();
             tableLayoutPanel7.SuspendLayout();
             tableLayoutPanel9.SuspendLayout();
@@ -493,11 +491,13 @@
             tbScreen.MinimumSize = new Size(269, 45);
             tbScreen.Name = "tbScreen";
             tbScreen.ReadOnly = true;
+            tbScreen.ScrollBars = ScrollBars.Horizontal;
             tbScreen.Size = new Size(269, 45);
             tbScreen.TabIndex = 0;
             tbScreen.TabStop = false;
             tbScreen.Text = "0";
             tbScreen.TextAlign = HorizontalAlignment.Right;
+            tbScreen.TextChanged += ScreenChangedText;
             // 
             // tableLayoutPanel2
             // 
@@ -506,8 +506,8 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel2.Controls.Add(btnCE, 0, 0);
-            tableLayoutPanel2.Controls.Add(btnC, 1, 0);
+            tableLayoutPanel2.Controls.Add(btnC, 0, 0);
+            tableLayoutPanel2.Controls.Add(btnClearSign, 1, 0);
             tableLayoutPanel2.Controls.Add(btnChangeSign, 2, 0);
             tableLayoutPanel2.Controls.Add(btnDivide, 3, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
@@ -519,24 +519,6 @@
             tableLayoutPanel2.Size = new Size(275, 71);
             tableLayoutPanel2.TabIndex = 1;
             // 
-            // btnCE
-            // 
-            btnCE.BackColor = Color.FromArgb(18, 18, 18);
-            btnCE.Dock = DockStyle.Fill;
-            btnCE.FlatAppearance.BorderSize = 0;
-            btnCE.FlatAppearance.MouseDownBackColor = Color.FromArgb(13, 13, 13);
-            btnCE.FlatAppearance.MouseOverBackColor = Color.FromArgb(26, 26, 26);
-            btnCE.FlatStyle = FlatStyle.Flat;
-            btnCE.Font = new Font("Nirmala UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
-            btnCE.ForeColor = Color.FromArgb(119, 51, 255);
-            btnCE.Location = new Point(3, 3);
-            btnCE.Name = "btnCE";
-            btnCE.Size = new Size(62, 65);
-            btnCE.TabIndex = 0;
-            btnCE.Text = "C";
-            btnCE.UseVisualStyleBackColor = false;
-            btnCE.Click += OnClearBtnClick;
-            // 
             // btnC
             // 
             btnC.BackColor = Color.FromArgb(18, 18, 18);
@@ -547,13 +529,31 @@
             btnC.FlatStyle = FlatStyle.Flat;
             btnC.Font = new Font("Nirmala UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
             btnC.ForeColor = Color.FromArgb(119, 51, 255);
-            btnC.Location = new Point(71, 3);
+            btnC.Location = new Point(3, 3);
             btnC.Name = "btnC";
             btnC.Size = new Size(62, 65);
-            btnC.TabIndex = 1;
-            btnC.Text = "🡄";
+            btnC.TabIndex = 0;
+            btnC.Text = "C";
             btnC.UseVisualStyleBackColor = false;
             btnC.Click += OnClearBtnClick;
+            // 
+            // btnClearSign
+            // 
+            btnClearSign.BackColor = Color.FromArgb(18, 18, 18);
+            btnClearSign.Dock = DockStyle.Fill;
+            btnClearSign.FlatAppearance.BorderSize = 0;
+            btnClearSign.FlatAppearance.MouseDownBackColor = Color.FromArgb(13, 13, 13);
+            btnClearSign.FlatAppearance.MouseOverBackColor = Color.FromArgb(26, 26, 26);
+            btnClearSign.FlatStyle = FlatStyle.Flat;
+            btnClearSign.Font = new Font("Nirmala UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
+            btnClearSign.ForeColor = Color.FromArgb(119, 51, 255);
+            btnClearSign.Location = new Point(71, 3);
+            btnClearSign.Name = "btnClearSign";
+            btnClearSign.Size = new Size(62, 65);
+            btnClearSign.TabIndex = 1;
+            btnClearSign.Text = "🡄";
+            btnClearSign.UseVisualStyleBackColor = false;
+            btnClearSign.Click += OnClearBtnClick;
             // 
             // btnChangeSign
             // 
@@ -634,7 +634,6 @@
             tableLayoutPanel4.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             tableLayoutPanel4.ColumnCount = 1;
             tableLayoutPanel4.ColumnStyles.Add(new ColumnStyle());
-            tableLayoutPanel4.Controls.Add(textBox2, 0, 0);
             tableLayoutPanel4.Dock = DockStyle.Fill;
             tableLayoutPanel4.Location = new Point(0, 0);
             tableLayoutPanel4.Name = "tableLayoutPanel4";
@@ -648,14 +647,6 @@
             tableLayoutPanel4.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             tableLayoutPanel4.Size = new Size(200, 100);
             tableLayoutPanel4.TabIndex = 0;
-            // 
-            // textBox2
-            // 
-            textBox2.Dock = DockStyle.Fill;
-            textBox2.Location = new Point(8, 8);
-            textBox2.Name = "textBox2";
-            textBox2.Size = new Size(680, 23);
-            textBox2.TabIndex = 0;
             // 
             // tableLayoutPanel5
             // 
@@ -881,7 +872,6 @@
             MinimumSize = new Size(300, 455);
             Name = "Form1";
             Text = "Calculator";
-            Load += InitTimer;
             SizeChanged += ScaleFontSize;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
@@ -891,8 +881,6 @@
             tableLayoutPanel11.ResumeLayout(false);
             tableLayoutPanel2.ResumeLayout(false);
             tableLayoutPanel3.ResumeLayout(false);
-            tableLayoutPanel4.ResumeLayout(false);
-            tableLayoutPanel4.PerformLayout();
             tableLayoutPanel5.ResumeLayout(false);
             tableLayoutPanel7.ResumeLayout(false);
             tableLayoutPanel9.ResumeLayout(false);
@@ -909,7 +897,6 @@
         private Button button4;
         private Button button5;
         private TableLayoutPanel tableLayoutPanel4;
-        private TextBox textBox2;
         private TableLayoutPanel tableLayoutPanel5;
         private Button button6;
         private Button button7;
@@ -941,8 +928,8 @@
         private Button btnMultiply;
         private TextBox tbScreen;
         private TableLayoutPanel tableLayoutPanel2;
-        private Button btnCE;
         private Button btnC;
+        private Button btnClearSign;
         private Button btnChangeSign;
         private Button btnDivide;
         private TableLayoutPanel tableLayoutPanel8;
