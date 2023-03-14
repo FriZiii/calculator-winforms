@@ -51,7 +51,15 @@ namespace calculator_winforms
                 ChangeFontSize(child, btnSize, tbSize);
             }
         }
+        private bool IsPreviusAnOperation()
+        {
+            int lastChar = tbScreen.Text[^1];
+            if (lastChar.Equals('+') || lastChar.Equals('-') || lastChar.Equals('÷') || lastChar.Equals('×'))
+                return true;
+            return false;
+        }
 
+        #region Called when texbox screen has been changed
         private void LockBtnWhenError()
         {
             if (tbScreen.Text.Equals(divisionByZeroErrorMessage))
@@ -91,6 +99,10 @@ namespace calculator_winforms
             LockBtnWhenError();
             ScrollScreen();
         }
+
+        #endregion
+
+        #region Called when buttons has been clicked
 
         private void OnNumbersBtnClick(object sender, EventArgs e)
         {
@@ -158,7 +170,7 @@ namespace calculator_winforms
                 if (tbScreen.Text.Equals(divisionByZeroErrorMessage) || IsPreviusAnOperation())
                 {
                     currentValue = "0.";
-                    tbScreen.Text = currentValue;
+                    tbScreen.Text += currentValue;
                     return;
                 }
                 currentValue += ".";
@@ -180,14 +192,6 @@ namespace calculator_winforms
                 currentValue = string.Empty;
                 tbScreen.Text += operation;
             }
-        }
-
-        private bool IsPreviusAnOperation()
-        {
-            int lastChar = tbScreen.Text[^1];
-            if (lastChar.Equals('+') || lastChar.Equals('-') || lastChar.Equals('÷') || lastChar.Equals('×'))
-                return true;
-            return false;
         }
 
         private void OnEqualsBtnClick(object sender, EventArgs e)
@@ -220,5 +224,7 @@ namespace calculator_winforms
                 }
             }
         }
+
+        #endregion
     }
 }
