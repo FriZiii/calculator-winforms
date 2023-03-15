@@ -872,6 +872,7 @@
             MinimumSize = new Size(300, 455);
             Name = "Form1";
             Text = "Calculator";
+            Load += InitTimer;
             SizeChanged += ScaleFontSize;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();

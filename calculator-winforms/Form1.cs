@@ -1,5 +1,6 @@
 using System.Data;
 using System.Drawing;
+using System.Linq.Expressions;
 using System.Security.Policy;
 using System.Timers;
 
@@ -51,12 +52,41 @@ namespace calculator_winforms
                 ChangeFontSize(child, btnSize, tbSize);
             }
         }
+
         private bool IsPreviusAnOperation()
         {
             int lastChar = tbScreen.Text[^1];
             if (lastChar.Equals('+') || lastChar.Equals('-') || lastChar.Equals('÷') || lastChar.Equals('×'))
                 return true;
             return false;
+        }
+
+        private bool IsContainAnOperation()
+        {
+            var screen = tbScreen.Text;
+            if ((screen.Contains("+") || screen.Contains("-") || screen.Contains("÷") || screen.Contains("×")))
+            {
+                Console.WriteLine($"Zawiera znak: {screen}");
+                return true;
+            }
+            return false;
+        }
+
+        private int GetIndexOfLastOperation()
+        {
+            string expression = tbScreen.Text;
+            char[] operators = { '+', '-', '×', '÷' };
+            int lastIndex = -1;
+
+            for (int i = expression.Length - 1; i >= 0; i--)
+            {
+                if (operators.Contains(expression[i]))
+                {
+                    lastIndex = i;
+                    break;
+                }
+            }
+            return lastIndex;
         }
 
         #region Called when texbox screen has been changed
@@ -91,7 +121,7 @@ namespace calculator_winforms
         private void ScrollScreen()
         {
             tbScreen.SelectionStart = tbScreen.TextLength;
-            tbScreen.ScrollToCaret(); 
+            tbScreen.ScrollToCaret();
         }
 
         private void ScreenChangedText(object sender, EventArgs e)
@@ -116,8 +146,15 @@ namespace calculator_winforms
                 currentValue = string.Empty;
                 tbScreen.Text = currentValue;
             }
-
             var value = ((Button)sender).Text;
+
+            if(currentValue.Equals(string.Empty) && value.Equals("0"))
+            {
+                currentValue = "0.";
+                tbScreen.Text += "0.";
+                return;
+            }
+
 
             currentValue += value;
             tbScreen.Text += value;
@@ -130,8 +167,21 @@ namespace calculator_winforms
                 int lenght = tbScreen.Text.Length;
                 if (lenght > 1)
                 {
-                    currentValue = currentValue.Remove(currentValue.Length - 1);
+                    if (currentValue.Length != 0)
+                    {
+                        currentValue = currentValue.Remove(currentValue.Length - 1);
+                    }
                     tbScreen.Text = tbScreen.Text.Remove(lenght - 1);
+
+                    if (!IsContainAnOperation())
+                    {
+                        Console.WriteLine("teraz");
+                        currentValue = tbScreen.Text;
+                    }
+                    else
+                    {
+                        currentValue = tbScreen.Text.Substring(GetIndexOfLastOperation() + 1);
+                    }
                 }
                 else if (lenght == 1)
                 {
@@ -167,7 +217,13 @@ namespace calculator_winforms
         {
             if (!currentValue.Contains('.'))
             {
-                if (tbScreen.Text.Equals(divisionByZeroErrorMessage) || IsPreviusAnOperation())
+                if (tbScreen.Text.Equals(divisionByZeroErrorMessage))
+                {
+                    currentValue = "0.";
+                    tbScreen.Text = currentValue;
+                    return;
+                }
+                if (IsPreviusAnOperation())
                 {
                     currentValue = "0.";
                     tbScreen.Text += currentValue;
@@ -206,6 +262,7 @@ namespace calculator_winforms
 
                     var result = dt.Compute(expression, "").ToString();
                     double resultAsDouble = Convert.ToDouble(result);
+
                     if (double.IsInfinity(resultAsDouble) || result.Equals("NaN"))
                     {
                         tbScreen.Text = divisionByZeroErrorMessage;
@@ -218,13 +275,29 @@ namespace calculator_winforms
                 {
                     tbScreen.Text = divisionByZeroErrorMessage;
                 }
-                catch(OverflowException)
+                catch (OverflowException)
                 {
                     tbScreen.Text = divisionByZeroErrorMessage;
                 }
             }
         }
 
+        #endregion
+
+        #region TEST
+        private System.Windows.Forms.Timer timer1;
+
+        private void InitTimer(object sender, EventArgs e)
+        {
+            timer1 = new System.Windows.Forms.Timer();
+            timer1.Tick += new EventHandler(timer1_Tick);
+            timer1.Interval = 100; // in miliseconds
+            timer1.Start();
+        }
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            Console.WriteLine(currentValue.ToString());
+        }
         #endregion
     }
 }
