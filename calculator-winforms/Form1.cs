@@ -9,8 +9,9 @@ namespace calculator_winforms
     public partial class Form1 : Form
     {
         IFormatProvider cultureUS = new System.Globalization.CultureInfo("en-US");
-        const string divisionByZeroErrorMessage = "Impossible";
-        public string currentValue;
+        private const string divisionByZeroErrorMessage = "Impossible";
+        private string currentValue;
+        private List<string> currentValues = new();
 
         public Form1()
         {
@@ -53,40 +54,20 @@ namespace calculator_winforms
             }
         }
 
-        private bool IsPreviusAnOperation()
-        {
-            int lastChar = tbScreen.Text[^1];
-            if (lastChar.Equals('+') || lastChar.Equals('-') || lastChar.Equals('÷') || lastChar.Equals('×'))
-                return true;
-            return false;
-        }
-
         private bool IsContainAnOperation()
         {
             var screen = tbScreen.Text;
             if ((screen.Contains("+") || screen.Contains("-") || screen.Contains("÷") || screen.Contains("×")))
             {
-                Console.WriteLine($"Zawiera znak: {screen}");
                 return true;
             }
             return false;
         }
 
-        private int GetIndexOfLastOperation()
+        private bool IsOnIndexIsOperation(int index)
         {
-            string expression = tbScreen.Text;
-            char[] operators = { '+', '-', '×', '÷' };
-            int lastIndex = -1;
-
-            for (int i = expression.Length - 1; i >= 0; i--)
-            {
-                if (operators.Contains(expression[i]))
-                {
-                    lastIndex = i;
-                    break;
-                }
-            }
-            return lastIndex;
+            var screen = tbScreen.Text;
+            return screen[screen.Length - index].Equals('+') || screen[screen.Length - index].Equals('-') || screen[screen.Length - index].Equals('÷') || screen[screen.Length - index].Equals('×');
         }
 
         #region Called when texbox screen has been changed
@@ -150,8 +131,15 @@ namespace calculator_winforms
 
             if(currentValue.Equals(string.Empty) && value.Equals("0"))
             {
-                currentValue = "0.";
-                tbScreen.Text += "0.";
+                currentValue = "0";
+                tbScreen.Text += "0";
+                return;
+            }
+            if (currentValue.Equals("0"))
+            {
+                currentValue = value;
+                tbScreen.Text = tbScreen.Text.Remove(tbScreen.Text.Length - 1);
+                tbScreen.Text += currentValue;
                 return;
             }
 
@@ -171,26 +159,29 @@ namespace calculator_winforms
                     {
                         currentValue = currentValue.Remove(currentValue.Length - 1);
                     }
-                    tbScreen.Text = tbScreen.Text.Remove(lenght - 1);
 
-                    if (!IsContainAnOperation())
+                    if(IsOnIndexIsOperation(1))
                     {
-                        Console.WriteLine("teraz");
-                        currentValue = tbScreen.Text;
+                        if (!IsOnIndexIsOperation(2))
+                        {
+                            currentValue = currentValues[^1];
+                            currentValues.RemoveAt(currentValues.Count - 1);
+                        }
                     }
-                    else
-                    {
-                        currentValue = tbScreen.Text.Substring(GetIndexOfLastOperation() + 1);
-                    }
+
+                    tbScreen.Text = tbScreen.Text.Remove(lenght - 1);
                 }
                 else if (lenght == 1)
                 {
+                    currentValues.Clear();
                     tbScreen.Text = "0";
+                    currentValue = tbScreen.Text;
                 }
             }
             else
             {
                 currentValue = "0";
+                currentValues.Clear();
                 tbScreen.Text = currentValue;
             }
         }
@@ -200,7 +191,7 @@ namespace calculator_winforms
 
             if (!tbScreen.Text.Equals(divisionByZeroErrorMessage))
             {
-                if (!tbScreen.Text.Equals("0") && !IsPreviusAnOperation())
+                if (!tbScreen.Text.Equals("0") && !IsOnIndexIsOperation(1))
                 {
                     var value = double.Parse(currentValue, cultureUS);
                     value *= -1;
@@ -223,7 +214,7 @@ namespace calculator_winforms
                     tbScreen.Text = currentValue;
                     return;
                 }
-                if (IsPreviusAnOperation())
+                if (IsOnIndexIsOperation(1))
                 {
                     currentValue = "0.";
                     tbScreen.Text += currentValue;
@@ -236,26 +227,25 @@ namespace calculator_winforms
 
         private void OnOperationsBtnClick(object sender, EventArgs e)
         {
-            if (!tbScreen.Text.Equals(divisionByZeroErrorMessage))
-            {
-                var operation = ((Button)sender).Text;
+           var operation = ((Button)sender).Text;
 
-                if (IsPreviusAnOperation())
-                {
-                    tbScreen.Text = tbScreen.Text.Remove(tbScreen.Text.Length - 1) + operation;
-                    return;
-                }
-                currentValue = string.Empty;
-                tbScreen.Text += operation;
+            if (IsOnIndexIsOperation(1))
+            {
+                tbScreen.Text = tbScreen.Text.Remove(tbScreen.Text.Length - 1) + operation;
+                return;
             }
+            currentValues.Add(currentValue.ToString(cultureUS));
+            currentValue = string.Empty;
+            tbScreen.Text += operation;
         }
 
         private void OnEqualsBtnClick(object sender, EventArgs e)
         {
-            if (!IsPreviusAnOperation())
+            if (!IsOnIndexIsOperation(1))
             {
                 var expression = tbScreen.Text.Replace("×", "*").Replace("÷", "/");
 
+                currentValues.Clear();
                 try
                 {
                     DataTable dt = new();
@@ -266,18 +256,21 @@ namespace calculator_winforms
                     if (double.IsInfinity(resultAsDouble) || result.Equals("NaN"))
                     {
                         tbScreen.Text = divisionByZeroErrorMessage;
+                        currentValue = string.Empty;
                         return;
                     }
-                    tbScreen.Text = resultAsDouble.ToString("G6").Replace(',', '.');
+                    tbScreen.Text = resultAsDouble.ToString("0.######", cultureUS);
                     currentValue = tbScreen.Text;
                 }
                 catch (DivideByZeroException)
                 {
                     tbScreen.Text = divisionByZeroErrorMessage;
+                    currentValue = string.Empty;
                 }
                 catch (OverflowException)
                 {
                     tbScreen.Text = divisionByZeroErrorMessage;
+                    currentValue = string.Empty;
                 }
             }
         }
@@ -296,7 +289,7 @@ namespace calculator_winforms
         }
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Console.WriteLine(currentValue.ToString());
+            Console.WriteLine($"{currentValue} : [{string.Join(", ",currentValues)}]");
         }
         #endregion
     }
