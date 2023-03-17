@@ -15,3 +15,7 @@ E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\obj\Rel
 E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\obj\Release\net6.0-windows\calculator-winforms.pdb
 E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\obj\Release\net6.0-windows\calculator-winforms.genruntimeconfig.cache
 E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\obj\Release\net6.0-windows\ref\calculator-winforms.dll
+E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\bin\Release\net6.0-windows\calculator-winforms.dll.manifest
+E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\bin\Release\net6.0-windows\calculator-winforms.application
+E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\obj\Release\net6.0-windows\calculator-winforms.dll.manifest
+E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\obj\Release\net6.0-windows\calculator-winforms.application

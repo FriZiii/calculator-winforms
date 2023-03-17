@@ -497,7 +497,7 @@
             tbScreen.TabStop = false;
             tbScreen.Text = "0";
             tbScreen.TextAlign = HorizontalAlignment.Right;
-            tbScreen.TextChanged += ScreenChangedText;
+            tbScreen.TextChanged += OnScreenChangedText;
             // 
             // tableLayoutPanel2
             // 
@@ -872,7 +872,6 @@
             MinimumSize = new Size(300, 455);
             Name = "Form1";
             Text = "Calculator";
-            Load += InitTimer;
             SizeChanged += ScaleFontSize;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();

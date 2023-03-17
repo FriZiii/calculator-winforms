@@ -1,0 +1,5 @@
+E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\bin\Release\net6.0-windows\app.publish\calculator-winforms.exe
+E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\bin\Release\net6.0-windows\app.publish\calculator-winforms.dll
+E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\bin\Release\net6.0-windows\app.publish\calculator-winforms.deps.json
+E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\bin\Release\net6.0-windows\app.publish\calculator-winforms.runtimeconfig.json
+E:\Studia\Programowanie\WinForms\calculator-winforms\calculator-winforms\bin\Release\net6.0-windows\app.publish\calculator-winforms.pdb
